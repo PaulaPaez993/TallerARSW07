@@ -4,6 +4,7 @@ var api = useMockData ? apimock : apiclient;
 var BlueprintsApp = (function () {
     var blueprints = [];
     var selectedAuthor = '';
+    var currentBlueprint = null;
 
     function getBlueprints() {
         api.getBlueprintsByAuthor(selectedAuthor, function(data) {
@@ -20,7 +21,7 @@ var BlueprintsApp = (function () {
         blueprints.forEach(bp => {
             const row = $('<tr></tr>');
             row.append(`<td>${bp.name}</td>`);
-            row.append(`<td>${bp.points}</td>`);
+            row.append(`<td>${bp.points.length}</td>`);
 
             const button = $('<button class="btn btn-secondary">Open</button>');
             button.click(function() {
@@ -30,7 +31,7 @@ var BlueprintsApp = (function () {
             row.append(cell);
 
             tableBody.append(row);
-            totalPoints += bp.points;
+            totalPoints += bp.points.length;
         });
 
         $('#total-points').text(totalPoints);
@@ -41,7 +42,7 @@ var BlueprintsApp = (function () {
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (!points) return;
+        if (!points || points.length === 0) return;
 
         ctx.beginPath();
         ctx.moveTo(points[0].x, points[0].y);
@@ -60,6 +61,7 @@ var BlueprintsApp = (function () {
         api.getBlueprintsByNameAndAuthor(author, name, function(blueprint) {
             if (blueprint) {
                 $('#current-blueprint-name').text(name);
+                currentBlueprint = blueprint;
                 drawBlueprint(blueprint.points);
             } else {
                 $('#current-blueprint-name').text("Plano no encontrado");
@@ -72,6 +74,23 @@ var BlueprintsApp = (function () {
         $('#author-name').text(`${author}'s blueprints:`);
     }
 
+    function addPoint(event) {
+        const canvas = document.getElementById('blueprint-canvas');
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        if (currentBlueprint) {
+            currentBlueprint.points.push({x: x, y: y});
+            drawBlueprint(currentBlueprint.points);
+        }
+    }
+
+    function initEventHandlers() {
+        const canvas = document.getElementById('blueprint-canvas');
+        canvas.addEventListener('pointerdown', addPoint);
+    }
+
     return {
         getBlueprints: getBlueprints,
         openBlueprint: openBlueprint,
@@ -79,11 +98,16 @@ var BlueprintsApp = (function () {
         updateBlueprints: function (author) {
             setAuthor(author);
             getBlueprints();
-        }
+        },
+        initEventHandlers: initEventHandlers
     };
 })();
 
-$('#get-blueprints-btn').click(function () {
-    const author = $('#author').val();
-    BlueprintsApp.updateBlueprints(author);
+$(document).ready(function () {
+    $('#get-blueprints-btn').click(function () {
+        const author = $('#author').val();
+        BlueprintsApp.updateBlueprints(author);
+    });
+
+    BlueprintsApp.initEventHandlers();
 });
