@@ -43,6 +43,10 @@ https://github.com/user-attachments/assets/fbd323c9-579d-46a4-9c7b-3e55b7147f43
 	JSON.stringify(objetojavascript),
 	```
 	* Como en este caso se tienen tres operaciones basadas en _callbacks_, y que las mismas requieren realizarse en un orden específico, tenga en cuenta cómo usar las promesas de JavaScript [mediante alguno de los ejemplos disponibles](http://codepen.io/hcadavid/pen/jrwdgK).
+ * Para este caso, se cambiaron los diseños de app.js implementando la funcionalidad del guardado y de contar los puntos adecuadamente.
+ * https://github.com/user-attachments/assets/6e5eaed4-a71e-4a2c-bbe5-ed17e0d66f26
+
+
 
 5. Agregue el botón 'Create new blueprint', de manera que cuando se oprima: 
 	* Se borre el canvas actual.
