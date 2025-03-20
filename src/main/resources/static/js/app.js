@@ -6,6 +6,8 @@ var BlueprintsApp = (function () {
     var selectedAuthor = '';
     var currentBlueprint = null;
     var originalPoints = []; // Para almacenar los puntos originales
+    var isNewBlueprint = false;
+    
 
     function getBlueprints() {
         api.getBlueprintsByAuthor(selectedAuthor, function(data) {
@@ -150,6 +152,54 @@ var BlueprintsApp = (function () {
                 });
         }
     });
+
+    function saveBlueprint() {
+        if (currentBlueprint) {
+            const author = $('#author').val();
+            const blueprintName = currentBlueprint.name;
+    
+            if (isNewBlueprint) {
+                api.addNewBlueprint(author, currentBlueprint, function() {
+                    // Actualiza los blueprints y recalcula los puntos totales después de guardar
+                    api.getBlueprintsByAuthor(author, function(data) {
+                        blueprints = data;
+                        renderBlueprints();
+                        isNewBlueprint = false;
+                    });
+                });
+            } else {
+                api.updateBlueprint(author, blueprintName, currentBlueprint, function() {
+                    // Actualiza los blueprints y recalcula los puntos totales después de actualizar
+                    api.getBlueprintsByAuthor(author, function(data) {
+                        blueprints = data;
+                        renderBlueprints();
+                    });
+                });
+            }
+        }
+    }
+
+    function createNewBlueprint() {
+        const author = $('#author').val();
+        const blueprintName = prompt("Ingrese el nombre del nuevo blueprint:");
+        if (blueprintName) {
+            currentBlueprint = { 
+                author: author, 
+                name: blueprintName, 
+                points: [] 
+            };
+            $('#current-blueprint-name').text(blueprintName);
+            drawBlueprint([]);
+            isNewBlueprint = true;
+    
+            // Agregamos el nuevo blueprint a la lista local
+            if (!blueprints) {
+                blueprints = [];
+            }
+            blueprints.push(currentBlueprint);
+            renderBlueprints();
+        }
+    }
 
     function initEventHandlers() {
         const canvas = document.getElementById('blueprint-canvas');
