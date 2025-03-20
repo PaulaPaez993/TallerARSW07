@@ -1,54 +1,64 @@
-# Escuela Colombiana de Ingenieria Julio Garabito
+#### Escuela Colombiana de Ingeniería
+#### Procesos de desarrollo de software - PDSW
+#### Construción de un cliente 'grueso' con un API REST, HTML5, Javascript y CSS3. Parte II.
 
-## Integrantes:
-### Paula Natalia Paez Vega
-### Manuel Felipe Barrera
 
-# Ajustes Backend
-1. Se trabaja sobre la base del proyecto anterior donde se realizo el desarrollo del API REST.
-2. Se incluyen las dependencias 'webjars' y Bootstrap para su funcionamiento.
 
-![image](https://github.com/user-attachments/assets/201798a5-36ff-4bba-9b0f-a3d231ea8726)
+![](img/mock2.png)
 
-#Front-End - Vistas
+1. Agregue al canvas de la página un manejador de eventos que permita capturar los 'clicks' realizados, bien sea a través del mouse, o a través de una pantalla táctil. Para esto, tenga en cuenta [este ejemplo de uso de los eventos de tipo 'PointerEvent'](https://mobiforge.com/design-development/html5-pointer-events-api-combining-touch-mouse-and-pen) (aún no soportado por todos los navegadores) para este fin. Recuerde que a diferencia del ejemplo anterior (donde el código JS está incrustado en la vista), se espera tener la inicialización de los manejadores de eventos correctamente modularizado, tal [como se muestra en este codepen](https://codepen.io/hcadavid/pen/BwWbrw).
 
-Se crea el directorio donde estara la aplicacion de JavaScript, se deja estatica.
+2. Agregue lo que haga falta en sus módulos para que cuando se capturen nuevos puntos en el canvas abierto (si no se ha seleccionado un canvas NO se debe hacer nada):
+	1. Se agregue el punto al final de la secuencia de puntos del canvas actual (sólo en la memoria de la aplicación, AÚN NO EN EL API!).
+	2. Se repinte el dibujo.
 
-![image](https://github.com/user-attachments/assets/d814ad89-9ceb-420c-8616-a313a72d4655)
+3. Agregue el botón Save/Update. Respetando la arquitectura de módulos actual del cliente, haga que al oprimirse el botón:
+	1. Se haga PUT al API, con el plano actualizado, en su recurso REST correspondiente.
+	2. Se haga GET al recurso /blueprints, para obtener de nuevo todos los planos realizados.
+	3. Se calculen nuevamente los puntos totales del usuario.
 
-Se genera la pagina index con las referencias de las librerias.
+	Para lo anterior tenga en cuenta:
 
-![image](https://github.com/user-attachments/assets/7a289cf5-67ab-4955-8d5d-6f197ad6cdf2)
+	* jQuery no tiene funciones para peticiones PUT o DELETE, por lo que es necesario 'configurarlas' manualmente a través de su API para AJAX. Por ejemplo, para hacer una peticion PUT a un recurso /myrecurso:
 
-Se revisa que la pagina corra mediante la ubicacion indicada.
+	```javascript
+    return $.ajax({
+        url: "/mirecurso",
+        type: 'PUT',
+        data: '{"prop1":1000,"prop2":"papas"}',
+        contentType: "application/json"
+    });
+    
+	```
+	Para éste note que la propiedad 'data' del objeto enviado a $.ajax debe ser un objeto jSON (en formato de texto). Si el dato que quiere enviar es un objeto JavaScript, puede convertirlo a jSON con: 
+	
+	```javascript
+	JSON.stringify(objetojavascript),
+	```
+	* Como en este caso se tienen tres operaciones basadas en _callbacks_, y que las mismas requieren realizarse en un orden específico, tenga en cuenta cómo usar las promesas de JavaScript [mediante alguno de los ejemplos disponibles](http://codepen.io/hcadavid/pen/jrwdgK).
 
-![image](https://github.com/user-attachments/assets/97a86812-7944-4aa7-9ba8-2a369cc0fdd4)
+4. Agregue el botón 'Create new blueprint', de manera que cuando se oprima: 
+	* Se borre el canvas actual.
+	* Se solicite el nombre del nuevo 'blueprint' (usted decide la manera de hacerlo).
+	
+	Esta opción debe cambiar la manera como funciona la opción 'save/update', pues en este caso, al oprimirse la primera vez debe (igualmente, usando promesas):
 
-Y rectificamos que no existan errores en la consola de desarrollador del navegador.
+	1. Hacer POST al recurso /blueprints, para crear el nuevo plano.
+	2. Hacer GET a este mismo recurso, para actualizar el listado de planos y el puntaje del usuario.
 
-![image](https://github.com/user-attachments/assets/544438e4-dcea-4845-9a2d-0d9309892430)
+5. Agregue el botón 'DELETE', de manera que (también con promesas):
+	* Borre el canvas.
+	* Haga DELETE del recurso correspondiente.
+	* Haga GET de los planos ahora disponibles.
 
-# Front-End - Logica
+### Criterios de evaluación
 
-1. Se crea el modulo a manera de controlador con mas planos a los autorees 'quemados' en el codigo.
-
-![image](https://github.com/user-attachments/assets/8bef8a71-3dde-4848-b317-fee1560fb743)
-
-2. Se agregan los modulos a la pagina HTML
-
-![image](https://github.com/user-attachments/assets/fa69fb80-17e2-4b3a-9dca-9945e3077504)
-
-3. Se hacen los cambios respectivos para que el modulo mantenga de forma privada el nombre del autor, el listado de nombre y tamaño de los planos del autor seleccionado.
-
-4. En el modulo 'app.js' se genera la operacion publica que permita actualizar el listado de los planos segun cierta condiciones.
-
-![image](https://github.com/user-attachments/assets/42153728-c35c-47d2-b176-ef318413c2cc)
-
-5. Se agrega la operacion getBlueprintsByNameAndAuthor de 'apimock.js' al modulo 'app.js' y se permite seleccionar uno de éstos y graficarlo.
-
-![image](https://github.com/user-attachments/assets/45d2da7d-57b2-40f4-83bd-bbb7e4773704)
-
-6. Se modifica el codigo para permitir el cambio entre 'apimock' y 'apiclient' con solo una linea de codigo.
-
-![image](https://github.com/user-attachments/assets/cc53bdcb-68c7-44d4-a59e-4fcbdb445ddd)
-
+1. Funcional
+	* La aplicación carga y dibuja correctamente los planos.
+	* La aplicación actualiza la lista de planos cuando se crea y almacena (a través del API) uno nuevo.
+	* La aplicación permite modificar planos existentes.
+	* La aplicación calcula correctamente los puntos totales.
+2. Diseño
+	* Los callback usados al momento de cargar los planos y calcular los puntos de un autor NO hace uso de ciclos, sino de operaciones map/reduce.
+	* Las operaciones de actualización y borrado hacen uso de promesas para garantizar que el cálculo del puntaje se realice sólo hasta cando se hayan actualizados los datos en el backend. Si se usan callbacks anidados se evalúa como R.
+	
