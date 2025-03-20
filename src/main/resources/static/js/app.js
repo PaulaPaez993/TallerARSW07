@@ -5,6 +5,7 @@ var BlueprintsApp = (function () {
     var blueprints = [];
     var selectedAuthor = '';
     var currentBlueprint = null;
+    var originalPoints = []; // Para almacenar los puntos originales
 
     function getBlueprints() {
         api.getBlueprintsByAuthor(selectedAuthor, function(data) {
@@ -62,6 +63,7 @@ var BlueprintsApp = (function () {
             if (blueprint) {
                 $('#current-blueprint-name').text(name);
                 currentBlueprint = blueprint;
+                originalPoints = blueprint.points.slice(); // Guarda los puntos originales
                 drawBlueprint(blueprint.points);
             } else {
                 $('#current-blueprint-name').text("Plano no encontrado");
@@ -79,15 +81,79 @@ var BlueprintsApp = (function () {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-
         if (currentBlueprint) {
             currentBlueprint.points.push({x: x, y: y});
             drawBlueprint(currentBlueprint.points);
+            updateTotalPoints();
         }
     }
 
+    function updateTotalPoints() {
+        let totalPoints = 0;
+        blueprints.forEach(bp => {
+            totalPoints += bp.points.length;
+        });
+        $('#total-points').text(totalPoints);
+    }
+
+    function saveOrUpdateBlueprint() {
+        if (currentBlueprint) {
+            const index = blueprints.findIndex(bp => bp.name === currentBlueprint.name);
+            
+            if (index !== -1) {
+                blueprints[index].points = currentBlueprint.points.slice(); // Copia los puntos actuales
+            } else {
+                blueprints.push({...currentBlueprint}); // Copia el blueprint actual
+            }
+            updateTotalPoints();
+            renderBlueprints();
+        }
+    }
+
+    $('#save-blueprint-btn').click(saveOrUpdateBlueprint);
+
+    function clearCanvas() {
+        const canvas = document.getElementById('blueprint-canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function deleteBlueprint(author, blueprintName) {
+        const url = `http://localhost:8080/api/blueprints?author=${author}&name=${blueprintName}`;
+        return fetch(url, {
+            method: 'DELETE'
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Error al eliminar el blueprint');
+            }
+            return response.json();
+        });
+    }
+
+    $('#delete-blueprint-btn').click(function () {
+        const author = $('#author').val();
+        const blueprintName = $('#current-blueprint-name').text();
+    
+        if (currentBlueprint) {
+            clearCanvas();
+    
+            api.deleteBlueprint(author, blueprintName)
+                .then(() => {
+                    blueprints = blueprints.filter(bp => bp.name !== blueprintName);
+                    renderBlueprints();
+                    currentBlueprint = null;
+                    $('#current-blueprint-name').text('None');
+                    updateTotalPoints(); 
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    });
+
     function initEventHandlers() {
         const canvas = document.getElementById('blueprint-canvas');
+        canvas.removeEventListener('pointerdown', addPoint);
         canvas.addEventListener('pointerdown', addPoint);
     }
 

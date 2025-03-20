@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-BlueprintApp<blueprints-middleware>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "edu.eci.arsw.blueprints.BlueprintApp",
+            "projectName": "blueprints-middleware",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
