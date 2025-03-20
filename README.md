@@ -12,12 +12,15 @@ Manuel Felipe Barrera Barrera
 
 ![image](https://github.com/user-attachments/assets/426ad085-0cec-4159-aefb-8ed941f85843)
 
+En este campo se genera un canvas, que permite obtener los clicks a medida que se va desarrollando el plano, esto funciona adecuadamente gracias a los llamados de los eventos haciendolos de forma modularizada.
 
 3. Agregue lo que haga falta en sus módulos para que cuando se capturen nuevos puntos en el canvas abierto (si no se ha seleccionado un canvas NO se debe hacer nada):
 	1. Se agregue el punto al final de la secuencia de puntos del canvas actual (sólo en la memoria de la aplicación, AÚN NO EN EL API!).
 	2. Se repinte el dibujo.
 
 https://github.com/user-attachments/assets/fbd323c9-579d-46a4-9c7b-3e55b7147f43
+
+En este punto se configura para obtener el punto final de la secuencia de puntos del canvas en memoria, tambien permitiendo repintar el dibujo.
 
 4. Agregue el botón Save/Update. Respetando la arquitectura de módulos actual del cliente, haga que al oprimirse el botón:
 	1. Se haga PUT al API, con el plano actualizado, en su recurso REST correspondiente.
@@ -59,6 +62,8 @@ https://github.com/user-attachments/assets/fbd323c9-579d-46a4-9c7b-3e55b7147f43
 
 https://github.com/user-attachments/assets/6653a449-482b-4ac9-b514-62cc2c620d69
 
+Se cambia la forma en la que se realiza el save/update para que al oprimirse con un POST cree un nuevo plano y con un GET en el mismo recurso, actualice el listado de planos y el puntaje del usuario.
+
 6. Agregue el botón 'DELETE', de manera que (también con promesas):
 	* Borre el canvas.
 	* Haga DELETE del recurso correspondiente.
@@ -67,18 +72,4 @@ https://github.com/user-attachments/assets/6653a449-482b-4ac9-b514-62cc2c620d69
  * Para realizar el borrado se añaden funcionalidades al app.js, como bien seria el delete, y se acomoda el mock para que de esta forma, se obtengan los metodos correspondientes, permitiendo el borrado, despues cuando se busca hacer un get del autor especifico, no retornara ya que estos datos fueron borrados.
  * Funcion delete:
  * ![image](https://github.com/user-attachments/assets/e04e47fa-29bb-4b19-bb46-636338dbd94d)
-
-
-
-
-### Criterios de evaluación
-
-1. Funcional
-	* La aplicación carga y dibuja correctamente los planos.
-	* La aplicación actualiza la lista de planos cuando se crea y almacena (a través del API) uno nuevo.
-	* La aplicación permite modificar planos existentes.
-	* La aplicación calcula correctamente los puntos totales.
-2. Diseño
-	* Los callback usados al momento de cargar los planos y calcular los puntos de un autor NO hace uso de ciclos, sino de operaciones map/reduce.
-	* Las operaciones de actualización y borrado hacen uso de promesas para garantizar que el cálculo del puntaje se realice sólo hasta cando se hayan actualizados los datos en el backend. Si se usan callbacks anidados se evalúa como R.
 	
