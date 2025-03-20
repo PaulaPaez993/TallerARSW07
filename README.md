@@ -58,7 +58,7 @@ Manuel Felipe Barrera Barrera
  * https://github.com/user-attachments/assets/efb507be-1b36-414b-a223-ffa52718307b
  * Para realizar el borrado se añaden funcionalidades al app.js, como bien seria el delete, y se acomoda el mock para que de esta forma, se obtengan los metodos correspondientes, permitiendo el borrado, despues cuando se busca hacer un get del autor especifico, no retornara ya que estos datos fueron borrados.
  * Funcion delete:
-   	![image](https://github.com/user-attachments/assets/e04e47fa-29bb-4b19-bb46-636338dbd94d)
+ * ![image](https://github.com/user-attachments/assets/e04e47fa-29bb-4b19-bb46-636338dbd94d)
 
 
 
